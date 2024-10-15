@@ -5,7 +5,7 @@ tensor0d = torch.tensor(1) # Creates a zero-dimensional tensor (scalar) from a P
 
 tensor1d = torch.tensor([1, 2, 3]) # Creates a one-dimensional tensor (vector) from a Python list
 
-tensor2d = torch.tensor([[1, 2], # Creates a two-dimensional tensor from a nsted Python list
+tensor2d = torch.tensor([[1, 2], # Creates a two-dimensional tensor from a nested Python list
                          [3, 4]])
 
 tensor3d = torch.tensor([[[1, 2], [3, 4]], # Creates a three-dimensional tensor from a nested Python list
