@@ -7,3 +7,6 @@ https://www.manning.com/books/build-a-large-language-model-from-scratch
 The method described in this book for training and developing your own small-but-functional model for educational purposes mirrors the approach used in creating large-scale foundational models such as those behind ChatGPT. The book uses Python and PyTorch for all its coding examples."
 
 By Sebastian Raschka
+
+Book Repo:
+https://github.com/rasbt/LLMs-from-scratch/
