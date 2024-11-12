@@ -203,7 +203,7 @@ print(out)
 total_params = sum(p.numel() for p in model.parameters()) # numel = "number of elements"
 
 # 163,009,536, due to "weight tying", used in original GPT-2 architecture
-# Means the GPT-2 architecture resuses the weights from the token embedding layer in its output layer.
+# Means the GPT-2 architecture reuses the weights from the token embedding layer in its output layer.
 print(f"\nTotal number of parameters: {total_params:,}")
 
 print("\nToken embedding layer shape:", model.tok_emb.weight.shape)
