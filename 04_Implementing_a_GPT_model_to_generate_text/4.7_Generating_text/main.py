@@ -176,131 +176,56 @@ GPT_CONFIG_124M = {
 }
 
 
+def generate_text_simple(model, idx, max_new_tokens, context_size):
+    # idx is (batch, n_tokens) array of indices in the current context
+    for _ in range(max_new_tokens):
+        # Crop current context if it exceeds the supported context size
+        # E.g., if LLM supports only 5 tokens, and the context size is 10
+        # then only the last 5 tokens are used as context
+        idx_cond = idx[:, -context_size:]
+
+        # Get the predictions
+        with torch.no_grad():
+            logits = model(idx_cond)
+        
+        # Focus only on the last time step
+        # (batch, n_tokens, vocab_size) becomes (batch, vocab_size)
+        logits = logits[:, -1, :]
+
+        # Apply softmax to get probabilities
+        probas = torch.softmax(logits, dim=-1) # (batch, vocab_size)
+        
+        # Get the idx of the vocab entry with the highest probability value
+        idx_next = torch.argmax(probas, dim=-1, keepdim=True)
+
+        # Append sampled index to the running sequence
+        idx = torch.cat((idx, idx_next), dim=1) # (batch, n_tokens+1)
+    
+    return idx
+
+
 tokenizer = tiktoken.get_encoding("gpt2")
-batch = []
-txt1 = "Every effort moves you"
-txt2 = "Every day holds a"
-
-batch.append(torch.tensor(tokenizer.encode(txt1)))
-batch.append(torch.tensor(tokenizer.encode(txt2)))
-
-batch = torch.stack(batch, dim=0)
-# print(batch)
-"""
-tensor([[6109, 3626, 6100,  345], <--- token IDs of txt1
-        [6109, 1110, 6622,  257]]) <--- token IDs of txt2
-"""
-
-torch.manual_seed(123)
-
 model = GPTModel(GPT_CONFIG_124M)
-# print(model)
+# torch.manual_seed(123)
 
-out = model(batch)
-print("\nInput batch:\n", batch)
-print("Output batch:\n", out.shape)
-print(out)
+start_context = "Hello, I am"
+encoded = tokenizer.encode(start_context)
+print("encoded:", encoded)
 
-total_params = sum(p.numel() for p in model.parameters()) # numel = "number of elements"
+encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+print("encoded_tensor.shape:", encoded_tensor.shape)
 
-# 163,009,536, due to "weight tying", used in original GPT-2 architecture
-# Means the GPT-2 architecture reuses the weights from the token embedding layer in its output layer.
-print(f"\nTotal number of parameters: {total_params:,}")
+model.eval() # disables dropout since we are not training the model
 
-print("\nToken embedding layer shape:", model.tok_emb.weight.shape)
-print("Output layer shape:", model.out_head.weight.shape)
-
-# Removing output layer parameter count from the total GPT-2 model count
-total_params_gpt2 = (
-    total_params - sum(p.numel() for p in model.out_head.parameters())
+out = generate_text_simple(
+    model=model,
+    idx=encoded_tensor,
+    max_new_tokens=6,
+    context_size=GPT_CONFIG_124M["context_length"]
 )
 
-print(f"\nNumber of trainable parameters considering weight tying: {total_params_gpt2:,}\n")
+print("Output:", out)
+print("Output length:", len(out[0]))
 
-# Computing memory requirements of the 163 million parameters
-total_size_bytes = total_params * 4 # calculates the total size in bytes (assuming float32), 4 bytes per parameter
-total_size_mb = total_size_bytes / (1024 * 1024) # converts to megabytes
-print(f"\nTotal size of the model: {total_size_mb:.2f} MB\n")
-
-
-print("-----------------------------------------------------------------")
-# Exercise 4.1 Number of parameters in feed forward and attention modules
-block = TransformerBlock(GPT_CONFIG_124M)
-
-ffn_params = sum(p.numel() for p in block.ff.parameters())
-print(f"1 Feed forward module parameters: {ffn_params:,}")
-
-multi_att_params = sum(p.numel() for p in block.att.parameters())
-print(f"1 Multi attention module parameters: {multi_att_params:,}")
-
-ffn_params_total = sum(p.numel() for p in block.ff.parameters()) * 12
-print(f"\n12 Feed forward module parameters: {ffn_params_total:,}")
-
-multi_att_params_total = sum(p.numel() for p in block.att.parameters()) * 12
-print(f"12 Multi attention module parameters: {multi_att_params_total:,}")
-
-print("\n-----------------------------------------------------------------")
-# Exercise 4.2 Initializing larger GPT models
-
-GPT_CONFIG = {
-    "vocab_size": 50257,        # Vocabulary size
-    "context_length": 1024,     # Context length
-    "emb_dim": 768,             # Embedding dimension
-    "n_heads": 12,              # Number of attention heads
-    "n_layers": 12,             # Number of layers
-    "drop_rate": 0.1,           # Dropout rate
-    "qkv_bias": False           # Query-Key-Value bias
-}
-
-def get_config(base_config, model_name="gpt2-small"):
-    GPT_CONFIG = base_config.copy()
-
-    if model_name == "gpt2-small":
-        GPT_CONFIG["emb_dim"] = 768
-        GPT_CONFIG["n_layers"] = 12
-        GPT_CONFIG["n_heads"] = 12
-    
-    elif model_name == "gpt2-medium":
-        GPT_CONFIG["emb_dim"] = 1024
-        GPT_CONFIG["n_layers"] = 24
-        GPT_CONFIG["n_heads"] = 16
-    
-    elif model_name == "gpt2-large":
-        GPT_CONFIG["emb_dim"] = 1280
-        GPT_CONFIG["n_layers"] = 36
-        GPT_CONFIG["n_heads"] = 20
-    
-    elif model_name == "gpt2-xl":
-        GPT_CONFIG["emb_dim"] = 1600
-        GPT_CONFIG["n_layers"] = 48
-        GPT_CONFIG["n_heads"] = 25
-    
-    else:
-        raise ValueError(f"Incorrect model name {model_name}")
-    
-    return GPT_CONFIG
-
-
-def calculate_size(model):
-
-    total_params = sum(p.numel() for p in model.parameters())
-    print(f"\nTotal number of parameters: {total_params:,}")
-
-    total_params_gpt2 = total_params - sum(p.numel() for p in model.out_head.parameters())
-    print(f"Number of trainable parameters considering weight tying: {total_params_gpt2:,}")
-    
-    # Calculate the total size in bytes (assuming float32, 4 bytes per parameter)
-    total_size_bytes = total_params * 4
-    
-    # Convert to megabytes
-    total_size_mb = total_size_bytes / (1024 * 1024)
-    
-    print(f"Total size of the model: {total_size_mb:.2f} MB")
-
-
-for model_abbrev in ("small", "medium", "large", "xl"):
-    model_name = f"gpt2-{model_abbrev}"
-    CONFIG = get_config(GPT_CONFIG, model_name=model_name)
-    model = GPTModel(CONFIG)
-    print(f"\n\n{model_name}:")
-    calculate_size(model)
+decoded_text = tokenizer.decode(out.squeeze().tolist())
+print(decoded_text)

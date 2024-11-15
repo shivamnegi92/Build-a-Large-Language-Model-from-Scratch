@@ -3,12 +3,24 @@ import torch.nn as nn
 import tiktoken
 
 
+#          Exercise 4.3 Using separate dropout parameters
+
+#   Newly added to GPT Config and within the appropriate classes:
+
+#    1.  Dropout for embedding layers
+#           "drop_rate_emb": 0.1      
+#    2. Dropout for multi-head attention
+#           "drop_rate_attn": 0.1
+#    3. Dropout for shortcut connections
+#           "drop_rate_shortcut": 0.1
+
+
 class GPTModel(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
         self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
-        self.drop_emb = nn.Dropout(cfg["drop_rate"])
+        self.drop_emb = nn.Dropout(cfg["drop_rate_emb"]) # NEW: dropout for embedding layers
 
         self.trf_blocks = nn.Sequential(
             *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])]
@@ -43,13 +55,13 @@ class TransformerBlock(nn.Module):
             d_out=cfg["emb_dim"],
             context_length=cfg["context_length"],
             num_heads=cfg["n_heads"],
-            dropout=cfg["drop_rate"],
+            dropout=cfg["drop_rate_attn"], # NEW: dropout for multi-head attention
             qkv_bias=cfg["qkv_bias"]
         )
         self.ff = FeedForward(cfg)
         self.norm1 = LayerNorm(cfg["emb_dim"])
         self.norm2 = LayerNorm(cfg["emb_dim"])
-        self.drop_shortcut = nn.Dropout(cfg["drop_rate"])
+        self.drop_shortcut = nn.Dropout(cfg["drop_rate_shortcut"]) # NEW: dropout for shortcut connections
     
     def forward(self, x):
         # Shortcut connection for attention block
@@ -171,136 +183,14 @@ GPT_CONFIG_124M = {
     "emb_dim": 768,             # Embedding dimension
     "n_heads": 12,              # Number of attention heads
     "n_layers": 12,             # Number of layers
-    "drop_rate": 0.1,           # Dropout rate
+    "drop_rate_emb": 0.1,       # NEW: dropout for embedding layers
+    "drop_rate_attn": 0.1,      # NEW: dropout for multi-head attention
+    "drop_rate_shortcut": 0.1,  # NEW: dropout for shortcut connections
     "qkv_bias": False           # Query-Key-Value bias
 }
 
-
-tokenizer = tiktoken.get_encoding("gpt2")
-batch = []
-txt1 = "Every effort moves you"
-txt2 = "Every day holds a"
-
-batch.append(torch.tensor(tokenizer.encode(txt1)))
-batch.append(torch.tensor(tokenizer.encode(txt2)))
-
-batch = torch.stack(batch, dim=0)
-# print(batch)
-"""
-tensor([[6109, 3626, 6100,  345], <--- token IDs of txt1
-        [6109, 1110, 6622,  257]]) <--- token IDs of txt2
-"""
 
 torch.manual_seed(123)
-
+tokenizer = tiktoken.get_encoding("gpt2")
 model = GPTModel(GPT_CONFIG_124M)
-# print(model)
-
-out = model(batch)
-print("\nInput batch:\n", batch)
-print("Output batch:\n", out.shape)
-print(out)
-
-total_params = sum(p.numel() for p in model.parameters()) # numel = "number of elements"
-
-# 163,009,536, due to "weight tying", used in original GPT-2 architecture
-# Means the GPT-2 architecture reuses the weights from the token embedding layer in its output layer.
-print(f"\nTotal number of parameters: {total_params:,}")
-
-print("\nToken embedding layer shape:", model.tok_emb.weight.shape)
-print("Output layer shape:", model.out_head.weight.shape)
-
-# Removing output layer parameter count from the total GPT-2 model count
-total_params_gpt2 = (
-    total_params - sum(p.numel() for p in model.out_head.parameters())
-)
-
-print(f"\nNumber of trainable parameters considering weight tying: {total_params_gpt2:,}\n")
-
-# Computing memory requirements of the 163 million parameters
-total_size_bytes = total_params * 4 # calculates the total size in bytes (assuming float32), 4 bytes per parameter
-total_size_mb = total_size_bytes / (1024 * 1024) # converts to megabytes
-print(f"\nTotal size of the model: {total_size_mb:.2f} MB\n")
-
-
-print("-----------------------------------------------------------------")
-# Exercise 4.1 Number of parameters in feed forward and attention modules
-block = TransformerBlock(GPT_CONFIG_124M)
-
-ffn_params = sum(p.numel() for p in block.ff.parameters())
-print(f"1 Feed forward module parameters: {ffn_params:,}")
-
-multi_att_params = sum(p.numel() for p in block.att.parameters())
-print(f"1 Multi attention module parameters: {multi_att_params:,}")
-
-ffn_params_total = sum(p.numel() for p in block.ff.parameters()) * 12
-print(f"\n12 Feed forward module parameters: {ffn_params_total:,}")
-
-multi_att_params_total = sum(p.numel() for p in block.att.parameters()) * 12
-print(f"12 Multi attention module parameters: {multi_att_params_total:,}")
-
-print("\n-----------------------------------------------------------------")
-# Exercise 4.2 Initializing larger GPT models
-
-GPT_CONFIG = {
-    "vocab_size": 50257,        # Vocabulary size
-    "context_length": 1024,     # Context length
-    "emb_dim": 768,             # Embedding dimension
-    "n_heads": 12,              # Number of attention heads
-    "n_layers": 12,             # Number of layers
-    "drop_rate": 0.1,           # Dropout rate
-    "qkv_bias": False           # Query-Key-Value bias
-}
-
-def get_config(base_config, model_name="gpt2-small"):
-    GPT_CONFIG = base_config.copy()
-
-    if model_name == "gpt2-small":
-        GPT_CONFIG["emb_dim"] = 768
-        GPT_CONFIG["n_layers"] = 12
-        GPT_CONFIG["n_heads"] = 12
-    
-    elif model_name == "gpt2-medium":
-        GPT_CONFIG["emb_dim"] = 1024
-        GPT_CONFIG["n_layers"] = 24
-        GPT_CONFIG["n_heads"] = 16
-    
-    elif model_name == "gpt2-large":
-        GPT_CONFIG["emb_dim"] = 1280
-        GPT_CONFIG["n_layers"] = 36
-        GPT_CONFIG["n_heads"] = 20
-    
-    elif model_name == "gpt2-xl":
-        GPT_CONFIG["emb_dim"] = 1600
-        GPT_CONFIG["n_layers"] = 48
-        GPT_CONFIG["n_heads"] = 25
-    
-    else:
-        raise ValueError(f"Incorrect model name {model_name}")
-    
-    return GPT_CONFIG
-
-
-def calculate_size(model):
-
-    total_params = sum(p.numel() for p in model.parameters())
-    print(f"\nTotal number of parameters: {total_params:,}")
-
-    total_params_gpt2 = total_params - sum(p.numel() for p in model.out_head.parameters())
-    print(f"Number of trainable parameters considering weight tying: {total_params_gpt2:,}")
-    
-    # Calculate the total size in bytes (assuming float32, 4 bytes per parameter)
-    total_size_bytes = total_params * 4
-    
-    # Convert to megabytes
-    total_size_mb = total_size_bytes / (1024 * 1024)
-    
-    print(f"Total size of the model: {total_size_mb:.2f} MB")
-
-
-for model_abbrev in ("small", "medium", "large", "xl"):
-    model_name = f"gpt2-{model_abbrev}"
-    CONFIG = get_config(GPT_CONFIG, model_name=model_name)
-    model = GPTModel(CONFIG)
-    print(f"\n\n{model_name}:")
-    calculate_size(model)
+print(model)
