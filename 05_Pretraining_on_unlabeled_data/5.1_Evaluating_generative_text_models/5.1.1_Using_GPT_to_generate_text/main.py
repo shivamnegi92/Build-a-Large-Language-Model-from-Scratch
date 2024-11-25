@@ -203,7 +203,7 @@ def token_ids_to_text(token_ids, tokenizer):
     return tokenizer.decode(flat.tolist())
 
 
-# know as "GPT-2 small"
+# known as "GPT-2 small"
 GPT_CONFIG_124M = {
     "vocab_size": 50257,        # Vocabulary size
     "context_length": 256,     # Context length
