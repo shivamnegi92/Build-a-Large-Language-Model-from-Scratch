@@ -176,7 +176,7 @@ class FeedForward(nn.Module):
         return self.layers(x)
 
 
-# know as "GPT-2 small"
+# known as "GPT-2 small"
 GPT_CONFIG_124M = {
     "vocab_size": 50257,        # Vocabulary size
     "context_length": 1024,     # Context length
