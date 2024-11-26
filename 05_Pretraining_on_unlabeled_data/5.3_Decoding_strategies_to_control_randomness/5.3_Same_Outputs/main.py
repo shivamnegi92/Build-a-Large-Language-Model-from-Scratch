@@ -422,8 +422,8 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 )
 
 # ------------------------------------------------------------------------------------------------
-#          LLM will always generate the same outputs currently
-#               "temperate scaling" and "top-k" sampling need to be implemented
+#          Currently the LLM will always generate the same outputs
+#        "temperate scaling" and "top-k" sampling need to be implemented
 model.eval()
 
 token_ids = generate_text_simple(
