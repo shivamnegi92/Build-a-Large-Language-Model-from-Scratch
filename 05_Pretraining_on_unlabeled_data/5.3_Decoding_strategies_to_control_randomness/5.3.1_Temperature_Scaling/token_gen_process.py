@@ -86,7 +86,17 @@ plt.tight_layout()
 plt.show()
 
 
-# Exerc
+# Exercise 5.1
 for i, probas in enumerate(scaled_probas):
     print("\n\nTemperature", temperatures[i])
     print_sampled_tokens(probas)
+
+# Note that sampling offers an approximation of the actual probabilities when the word "pizza" is sampled
+# E.g., if it is sampled 32/1000 times, the estimated probability is 3.2%
+# To obtain the actual probability, we can check the probabilities directly by accessing the corresponding entry in scaled_probas
+# Since "pizza" is the 7th entry in the vocabulary, for the temperature of 5, we obtain it as follows:
+temp5_idx = 2
+pizza_idx = 6
+
+# There is a 4.3% probability that the word "pizza" is sampled if the temperature is set to 5
+print("\n", scaled_probas[temp5_idx][pizza_idx])
