@@ -86,7 +86,7 @@ plt.tight_layout()
 plt.show()
 
 
-# Exercise 5.1
+# Exercise 5.1 Temperature-scaled softmax scores and sampling probabilities
 for i, probas in enumerate(scaled_probas):
     print("\n\nTemperature", temperatures[i])
     print_sampled_tokens(probas)
