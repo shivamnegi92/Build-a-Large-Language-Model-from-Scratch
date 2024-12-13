@@ -74,7 +74,7 @@ def load_weights_into_gpt(gpt, params):
 # to those specified in params
 
 # np.split function (line #15) is used to divide the attention and bias weights into three equal
-# parts for the query, key, and valeu componenets
+# parts for the query, key, and value components
 
 # Referring to line #68, the original GPT-2 model by OpenAI reused the token embedding weights in the
 # output layer to reduce the total number of parameters, which is a concept known as weight tying.

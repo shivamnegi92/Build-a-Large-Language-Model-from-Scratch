@@ -29,8 +29,9 @@ def download_and_load_gpt2(model_size, models_dir):
         "model.ckpt.meta", "vocab.bpe"
     ]
 
-    # If the gpt2 directory doesn't exist, create the directory and download all the files, 
-    # e.g. model weights, the hyper parameters, etc. Else, skip and load settings and params.
+    # John addition -> Added a conditional check to skip downloading GPT-2 files 
+    # if the model directory already exists. This prevents redundant downloads and
+    # ensures the directory is only created when necessary.
     if not os.path.exists(model_dir):
         print("Downloading files..")
         # Download files
