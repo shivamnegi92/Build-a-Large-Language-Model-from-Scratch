@@ -618,9 +618,9 @@ spam = {
     # Small change to this ^, adding "SSN required." and the model classifies this now as "spam".
     "text_8": "Alert: We have blocked your debit card due to suspicious activity. Verify your info here. SSN required.", 
 
-    # Gets classified as "not spam," which is incorrect in this case. The friendly tone ("Hi friend") might confuse the model, but the content contains clear spam signals like unrealistic financial claims 
-    # ("make $2,000 daily") and urgency ("Limited-time opportunity"). Additional fine-tuning with examples 
-    # that blend conversational language and spammy content could help the model recognize these patterns better.
+    # Gets classified as "not spam," which is incorrect in this case. The friendly tone ("Hi friend") might confuse the model, 
+    # but the content contains clear spam signals like unrealistic financial claims ("make $2,000 daily") and urgency ("Limited-time opportunity").
+    # Additional fine-tuning with examples that blend conversational language and spammy content could help the model recognize these patterns better.
     "text_9": "Hi friend, see how I made $2,000 daily without leaving my couch. Limited-time opportunity!",
 
     # Small change to this ^, adding "Click this link: http://claim-your-prize-free.com/winner" and the model classifies this now as "spam".
