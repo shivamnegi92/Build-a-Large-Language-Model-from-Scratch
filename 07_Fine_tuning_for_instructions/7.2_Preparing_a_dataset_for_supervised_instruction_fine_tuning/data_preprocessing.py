@@ -9,8 +9,8 @@ def load_file(file_path):
     return data
 
 
-# Alpaca-style prompt formatting
 def format_input(entry):
+    # Alpaca-style prompt formatting
     instruction_text = (
         f"Below is an instruction that describes a task. "
         f"Write a response that appropriately completes the request."
