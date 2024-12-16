@@ -53,3 +53,16 @@ val_data = data[train_portion + test_portion:]
 print("\nTraining set length:", len(train_data))
 print("Validation set length:", len(val_data))
 print("Test set length:", len(test_data))
+
+# TODO: Exercise 7.1: Changing prompt styles
+# After fine-tuning the model with the Alpaca prompt style, try the Phi-3 prompt style
+# shown in figure 7.4 and observe whether it affects the response quality of the model.
+
+# def format_input(entry):
+#     instruction_text = (
+#         f"<|user|>\n{entry['instruction']}"
+#     )
+
+#     input_text = f"\n{entry['input']}" if entry["input"] else ""
+
+#     return instruction_text + input_text
