@@ -635,11 +635,11 @@ not_spam = {
     "text_3": "I'm running a bit late for the movie. Can you save me a seat in the back row?",
     "text_4": "Congrats on your promotion! Let's grab coffee next week to celebrate.",
     "text_5": "Don't forget your dentist appointment on Tuesday at 3 PM. Let me know if you need a reminder.",
-    "text_6":"Are you still okay to watch my dog next weekend? I'll drop off his food and toys tomorrow.",
-    "text_7":"Can you please review my draft report and let me know if it needs any changes?",
-    "text_8":"I'm making pasta for dinner tonight—do you want to come over around 7?",
-    "text_9":"Meeting got pushed back to 4 PM. Hope that still works for your schedule.",
-    "text_10":"Thanks for the birthday wishes! I really appreciate the kind words and support."
+    "text_6": "Are you still okay to watch my dog next weekend? I'll drop off his food and toys tomorrow.",
+    "text_7": "Can you please review my draft report and let me know if it needs any changes?",
+    "text_8": "I'm making pasta for dinner tonight—do you want to come over around 7?",
+    "text_9": "Meeting got pushed back to 4 PM. Hope that still works for your schedule.",
+    "text_10": "Thanks for the birthday wishes! I really appreciate the kind words and support."
 }
 
 
