@@ -615,7 +615,7 @@ spam = {
     # Additional fine-tuning with more nuanced examples might help the model distinguish such cases better.
     "text_7": "Alert: We have blocked your debit card due to suspicious activity. Verify your info here.",
     
-    # Small change to this ^, adding "SSN required." and the model classifies this now as "spam".
+    # Duplicate of the example above. Adding "SSN required." changes the classification to "spam," highlighting the model's sensitivity to explicit phishing cues.
     "text_8": "Alert: We have blocked your debit card due to suspicious activity. Verify your info here. SSN required.", 
 
     # Gets classified as "not spam," which is incorrect in this case. The friendly tone ("Hi friend") might confuse the model, 
@@ -623,7 +623,7 @@ spam = {
     # Additional fine-tuning with examples that blend conversational language and spammy content could help the model recognize these patterns better.
     "text_9": "Hi friend, see how I made $2,000 daily without leaving my couch. Limited-time opportunity!",
 
-    # Small change to this ^, adding "Click this link: http://claim-your-prize-free.com/winner" and the model classifies this now as "spam".
+    # Duplicate of the example above. Adding "Click this link: http://claim-your-prize-free.com/winner" triggers a "spam" classification, showing the model's response to explicit spam-like URLs.
     "text_10": "Hi friend, see how I made $2,000 daily without leaving my couch. Limited-time opportunity! Click this link: http://claim-your-prize-free.com/winner",
     "text_11": "You qualify for a free iPhone! Click and enter your shipping details to claim yours.",
     "text_12": "Don't miss out—only a few hours left to claim your lottery prize worth $10,000. Hurry!"
