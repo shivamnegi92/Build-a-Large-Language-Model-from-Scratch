@@ -195,7 +195,7 @@ print("\n", "Inputs:\n", inputs)
 print("\n", "Targets:\n", targets)
 
 
-# Testing custom_collate_draft function
+# Testing custom_collate_fn function
 print("\n*** Custom Collate Final ***")
 
 inputs, targets = custom_collate_fn(batch)
