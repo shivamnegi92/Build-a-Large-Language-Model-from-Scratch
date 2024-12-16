@@ -211,7 +211,7 @@ logits_1 = torch.tensor(
     [[-1.0, 1.0],  # 1st training example
      [-0.5, 1.5]]  # 2nd training example
 )
-targets_1 = torch.tensor([0, 1]) # Correct token indices to generate
+targets_1 = torch.tensor([0, 1]) # Target class indices indicating the correct label for each example
 
 loss_1 = torch.nn.functional.cross_entropy(logits_1, targets_1)
 print("\n", "Loss 1:", loss_1)
