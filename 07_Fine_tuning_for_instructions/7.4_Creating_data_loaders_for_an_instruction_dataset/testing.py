@@ -23,10 +23,10 @@ for inputs, targets in train_loader:
     print("Length of second example (train loader) tokens:", len(second_example_tokens), "\n") # 15 padding tokens (50256) get added
 
     # Decode token IDs back into text
-    first_example_text = tokenizer.decode(second_example_tokens)
+    second_example_text = tokenizer.decode(second_example_tokens)
 
-    print("Decoded Text for First Example in Batch:")
-    print(first_example_text)
+    print("Decoded Text for Second Example in Batch:")
+    print(second_example_text)
     break  # Stop after the first batch
 
 
